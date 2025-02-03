@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Food
+  - Water
+  - HP
   layers:
   - Default
   - TransparentFX
