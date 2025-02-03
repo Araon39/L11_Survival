@@ -1,45 +1,47 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 public class PlayerController : MonoBehaviour
 {
-    // Скорость движения игрока
-    public float moveSpeed;
+    public float speed = 5.0f;
+    public float rotationSpeed = 100.0f;
+    public float jumpForce = 5.0f;
+    private Rigidbody rb;
+    private bool isGrounded;
 
-    // Вектор для хранения направления движения
-    private Vector2 m_Move;
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
-    // Метод, вызываемый каждый кадр
     void Update()
     {
-        // Вызываем метод Move с текущим направлением движения
-        Move(m_Move);
+        float moveVertical = Input.GetAxis("Vertical");
+        float moveHorizontal = Input.GetAxis("Horizontal");
+
+        Vector3 movement = transform.forward * moveVertical * speed;
+        rb.velocity = new Vector3(movement.x, rb.velocity.y, movement.z);
+
+        if (isGrounded && Input.GetButtonDown("Jump"))
+        {
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+        }
+
+        transform.Rotate(0, moveHorizontal * rotationSpeed * Time.deltaTime, 0);
     }
 
-    // Метод, вызываемый при получении ввода движения
-    public void OnMove(InputAction.CallbackContext context)
+    void OnCollisionEnter(Collision collision)
     {
-        // Получаем значение направления движения из ввода и сохраняем его в m_Move
-        m_Move = context.ReadValue<Vector2>();
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
     }
 
-    // Метод для перемещения игрока
-    private void Move(Vector2 direction)
+    void OnCollisionExit(Collision collision)
     {
-        // Проверяем, чтобы направление движения было не нулевым
-        if (direction.sqrMagnitude < 0.01)
-            return;
-
-        // Вычисляем скорость движения с учетом времени
-        var scaledMoveSpeed = moveSpeed * Time.deltaTime;
-
-        // Вычисляем поворот на основе направления движения
-        var move = Quaternion.Euler(0, transform.eulerAngles.y, 0) * new Vector3(direction.x, 0, direction.y);
-
-        // Перемещаем игрока на вычисленное расстояние в вычисленном направлении
-        transform.position += move * scaledMoveSpeed;
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
     }
 }
