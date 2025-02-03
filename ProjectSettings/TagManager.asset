@@ -8,6 +8,7 @@ TagManager:
   - Food
   - Water
   - HP
+  - Obstacle
   layers:
   - Default
   - TransparentFX

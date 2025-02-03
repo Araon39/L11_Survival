@@ -51,4 +51,25 @@ public class Enemy : MonoBehaviour
         changeDirectionTimer = Random.Range(minChange, maxChange);
     }
 
+    // Метод для обработки столкновений
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("Obstacle collision");    
+            StartCoroutine(HandleObstacleCollision());
+        }
+    }
+
+    // Корутина для обработки столкновения с препятствием
+    IEnumerator HandleObstacleCollision()
+    {
+        agent.speed = 0; // Останавливаем движение
+        gameObject.GetComponent<Renderer>().material.color = Color.black; // Меняем цвет 
+        // Ждем 5 секунд
+        yield return new WaitForSeconds(10);
+
+        gameObject.GetComponent<Renderer>().material.color = Color.red; // Возвращаем цвет
+        agent.speed = 3; // Возобновляем движение
+    }
 }
